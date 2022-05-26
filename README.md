@@ -11,5 +11,5 @@ This project is a simple Login Page.
 3.Animation
 4.User Session maintained Using Shared Preference
 <p>
-  <img src="IMG_20220526_204339.jpg" width="400" title="MAIN-PAGE">
+  <img src="Images/IMG_20220526_204339.jpg" width="400" title="MAIN-PAGE">
 </p>
