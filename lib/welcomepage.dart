@@ -23,18 +23,21 @@ class _WelcomePageState extends State<WelcomePage>{
   late SharedPreferences logindata;
   late String userId = '';
   late Image bgImg ;
+
   @override
   void initState(){
     super.initState();
     initial_fun();
     bgImg=Image.asset("Images/qoute.png");
   }
+  //Getting UserEmail From Shared Preference
   void initial_fun() async{
     logindata = await SharedPreferences.getInstance();
     setState(() {
       userId = logindata.getString('email').toString();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -52,40 +55,33 @@ class _WelcomePageState extends State<WelcomePage>{
                  ),
          ),
         
-        Scaffold(
-                          backgroundColor: Colors.transparent, // <-- SCAFFOLD WITH TRANSPARENT BG
-
-        appBar: AppBar(
+        Scaffold( backgroundColor: Colors.transparent, // <-- SCAFFOLD WITH TRANSPARENT BG
+         appBar: AppBar(
           title: Text('Welcome To The DashBoard'),
         ),
-        body: 
-            
-                 Column(
-                  //  mainAxisAlignment: MainAxisAlignment.start,
-                  //  crossAxisAlignment: CrossAxisAlignment.center,
-                   children: [
-                     SizedBox(height: 10.0,),
-                     Padding(
-                       padding: EdgeInsets.fromLTRB(0, 0,5.0,0),
-                       child: Container(
-                         alignment: Alignment.center,
-                         child: Column(
-                           children: [
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: ElevatedButton(
-                                              onPressed: (){
-                                                logindata.setBool('login',true);
-                                              Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => LoginPage()));
-                                            }, 
-                                            child: Text('LogOut'),
-                                            ),
-                              ),
-                             Text(
-                              'Welcome $userId',
-                              style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),
-                                     ),
-                                    
+        body:Column(
+              children: [
+                SizedBox(height: 10.0,),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0,5.0,0),
+                  child: Container(
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                    Align(
+                    alignment: Alignment.topRight,
+                    child: ElevatedButton(
+                    onPressed: (){
+                    logindata.setBool('login',true);
+                     Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => LoginPage()));
+                                  }, 
+                     child: Text('LogOut'),
+                        ),
+                     ),
+                      Text(
+                       'Welcome $userId',
+                       style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),
+                                     ),    
                            ],
                          ),
                        ),
@@ -94,7 +90,7 @@ class _WelcomePageState extends State<WelcomePage>{
                    ],
                  ),
                  ),
-      ],
+              ],
         );      
        
   }

@@ -9,6 +9,7 @@ import 'welcomepage.dart';
 import 'dart:math' as Math;
 
 void main() => runApp(MyApp());
+
 class MyApp extends StatelessWidget{
   Widget build(BuildContext context){
     return MaterialApp(
@@ -53,19 +54,21 @@ int val=0;
 
 void initState(){
   super.initState();
-  // email_controller.addListener(validate_email());
-  // password_controller.addListener();
-  // email_controller2.addListener();
-  // newPassword_controller.addListener();
-  // re_newPassword_controller.addListener();
+
+  //Checking If The Person Has Logout Or Not
    autoLogin();
+
+   //Initialising Image Variables and Caching It To Avoid Flickering
     cardFront = Image.asset("Images/foody_guru_logo.png");
     cardBack  = Image.asset("Images/fodd_time.png");
     WidgetsBinding.instance!.addPostFrameCallback((_) {precacheImage(cardFront.image, context);precacheImage(cardBack.image, context); 
     });
+
     // Initialize the animation controller
     controller = AnimationController(vsync: this, duration: Duration(milliseconds: 4000), value: 0);
      controller.forward();
+
+     //Adding Listener To Controller To Make Animation In Loop
     controller.addListener(() {
       if(controller.isCompleted||controller.isDismissed){
         flipImage();
@@ -74,26 +77,20 @@ void initState(){
     });
 }
 
-// String? get _errorText_newpassword {
-//   String value = newPassword_controller.text;
-// if(value==null || value.isEmpty){
-//                     return '*Mandatory Field';
-//                   } 
-//   String value2=re_newPassword_controller.text;
-//   if(value2==null || value2.isEmpty){
-//                     return '*Mandatory Field';
-//                   }      
-//                   print(value + value2 + "");
-//                   if(!identical(value,value)){
-//                     return 'Re-Type New Password is incorrect';
-//                   }            
-//                 return null;
-                 
-// }
-// String? validate_email(){
-//  _formKey.currentState.validate();
-// }
-//Checking if user logout or not before leaving the app;
+String? email_validation(String? value) {
+   if(value==null || value.isEmpty){
+                  return '*Mandatory Field';
+                } 
+                bool emailvalid=RegExp( r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(value);
+                   print(emailvalid);
+                   if(emailvalid==false){
+                    return '*Enter Correct Email Address';
+                  }
+                  if(logindata.getString('email')!=value){
+                    return "Invalid email";
+                  }
+              return null;
+}
 void autoLogin() async{
   logindata = await SharedPreferences.getInstance();
   if(logindata.getString('email')==null){
@@ -106,11 +103,6 @@ void autoLogin() async{
   if(!userid){
     Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context)=> WelcomePage()));
   }
-  // if(userId!=null){setState(() {
-  //    isLoggedIn=true;
-  //   name=userId;
-  // });
-  //  return;
   }
 
 
@@ -119,26 +111,18 @@ void autoLogin() async{
     final degree270 = 3*Math.pi/2;
     return angle<=degree90 || angle>=degree270;
   }
-Future flipImage() async{
-//  controller.addListener(() {
-  // if(controller.isCompleted){
 
-    showFront = !showFront;
+Future flipImage() async{
+  showFront = !showFront;
     if(!showFront){
      controller.reverse();
-      
-  }
-  // if(controller.isDismissed){
+    }
     else{
  controller.forward();
-
   }
-//  });             
-  
-    // await controller.reverse();
-    // controller.repeat();
 }
-  //Setting visibility and contents of textfield for form2
+
+  //Setting visibility and contents of textfield in form
   void setVisibility(){
     setState(() {
       username=email_controller.text;
@@ -147,11 +131,14 @@ Future flipImage() async{
     });
   }
 
-
+//Dispose When Not In Use!!
 @override
 void dispose(){
   email_controller.dispose();
   password_controller.dispose();
+  email_controller2.dispose();
+  newPassword_controller.dispose();
+  re_newPassword_controller.dispose();
   controller.dispose();
   super.dispose();
 }
@@ -159,33 +146,34 @@ void dispose(){
 
 @override
 Widget build(BuildContext context){
-  
   return Scaffold(
     resizeToAvoidBottomInset: false,
     appBar: AppBar(
       title: Text(
-        "FoodGuru Login"
+        "FoodGuru"
       ),
     ),
     body: Center(
     
-      //Form1
+      //Form
       child: Form(
          key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+
+      //Logo Animation: ROtation Along Y Axis
          AnimatedBuilder(
             animation: controller,
             builder: (context, child) {
               double angle = controller.value * -Math.pi;
-              // if(showFront) angle += anglePlus; 
         final transform = Matrix4.identity()
         ..setEntry(3, 2, 0.001)
         ..rotateY(angle);
               return Transform(
                 transform: transform,
                 alignment: Alignment.center,
+                //
                 child: isFrontImage(angle.abs())?Transform(
                   transform: transform,
                   alignment: Alignment.center,              
@@ -207,12 +195,15 @@ Widget build(BuildContext context){
                 ),
               );
             },
-          ),                    
+          ),  
+
+
+          //Login Form                
         Visibility(
           visible: isVisibile,
           child: Column(children: [
             SizedBox(height: 50.0,),
-          Text("Login Form",
+          Text("Login",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           ),
         
@@ -232,18 +223,7 @@ Widget build(BuildContext context){
         
               //Email Validation
               validator: (value) {
-                if(value==null || value.isEmpty){
-                  return '*Mandatory Field';
-                } 
-                bool emailvalid=RegExp( r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(email_controller.text);
-                   print(emailvalid);
-                   if(emailvalid==false){
-                    return '*Enter Correct Email Address';
-                  }
-                  if(logindata.getString('email')!=value){
-                    return "Invalid email";
-                  }
-              return null;
+                return email_validation(value);
               },
             ),
           ),
@@ -254,10 +234,6 @@ Widget build(BuildContext context){
               child: SizedBox(
           width: 300.0,
           child: TextFormField(
-            // onChanged: (Text){
-            //   _formKey.currentState!.validate();
-        
-            // },
               obscureText: true,
               controller: password_controller,
               decoration: InputDecoration(
@@ -265,6 +241,7 @@ Widget build(BuildContext context){
             labelText: 'password',
               ),
         
+
               // Password Validation
               validator: (value) {
                 print(logindata.getString('password'));
@@ -282,9 +259,9 @@ Widget build(BuildContext context){
               ),
         
               ElevatedButton(onPressed:(){ 
-                            //  flipImage();
-        FocusScope.of(context).unfocus();
-
+           FocusScope.of(context).unfocus();
+          
+          //Validating Form Fields
           if(_formKey.currentState!.validate()){
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(backgroundColor: Colors.orange,
@@ -293,7 +270,7 @@ Widget build(BuildContext context){
                duration: const Duration(milliseconds: 2000),content: Text('Logging In..')),
             );
            
-            //Setting user as LoggedIn Storage
+            //Setting user as LoggedIn In Storage
             logindata.setBool('login', false);
                 print(logindata.getString('password'));
             
@@ -304,6 +281,8 @@ Widget build(BuildContext context){
           }
               }, child: Text("Log-In"),
               ),
+
+              //Forgot Password Section
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -325,7 +304,7 @@ Widget build(BuildContext context){
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           ),
         
-          //Email Verification For Form1 Reset Password
+          //Email Verification For Form Reset Password
           Padding(padding: const EdgeInsets.all(15.0),
           child: SizedBox(
             width: 300.0,
@@ -337,28 +316,14 @@ Widget build(BuildContext context){
               ),
               //Email Validation
               validator: (value) {
-                if(value==null || value.isEmpty){
-                  return '*Mandatory Field';
-                } 
-                bool emailvalid=RegExp( r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(email_controller2.text);
-                if(logindata.getString('email')!=value){
-                  return "Invalid email";
-                }   
-                   print(emailvalid);
-                   if(emailvalid==false){
-                    return '*Enter Correct Email Address';
-                  }
-              return null;
+               return email_validation(value);
               },
             ),
           ),
           ),
         ElevatedButton(onPressed:(){ 
           if(_formKey.currentState!.validate()){
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   const SnackBar(content: Text('A reset password mail has been sent')),
-            // );
-        
+  
             //Dialog Box For Updating Password
             showDialog(context: context, builder: (context){
               return Form(
@@ -374,6 +339,7 @@ Widget build(BuildContext context){
                           Text("Reset Password",
                           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                           ),
+
                           //New Password Field
                           Padding(padding: const EdgeInsets.all(15.0),
                           child: SizedBox(
@@ -385,6 +351,8 @@ Widget build(BuildContext context){
                             border: OutlineInputBorder(),
                             labelText: 'New Password',
                   ),
+
+                  //Validating New Password Field
                   validator: (value) {
                     if(value==null || value.isEmpty){
                       return '*Mandatory Field';
@@ -395,7 +363,7 @@ Widget build(BuildContext context){
                           ),
                           ),
                 
-                          //Re-Enter New Password Field
+                   //Re-Enter New Password Field
                   Padding(padding: const EdgeInsets.all(15.0),
                   child: SizedBox(
                           width: 300.0,
@@ -406,13 +374,13 @@ Widget build(BuildContext context){
                             border: OutlineInputBorder(),
                             labelText: 'Re-Type New Password',
                   ),
+
                   //Re-Enter New Password Field Validation
                   validator: (value) {
-                    // errorText: _errorText_newpassword,
+
                      if(value==null || value.isEmpty){
                       return '*Mandatory Field';
                     }      
-                    print(re_newPassword_controller.text +" " + newPassword_controller.text + "");
                     if(re_newPassword_controller.text!=newPassword_controller.text){
                       return 'Re-Type New Password is incorrect';
                     }            
@@ -421,23 +389,23 @@ Widget build(BuildContext context){
                             ),
                   ),
                   ),
+
+                  //Update Password Button
                   ElevatedButton(onPressed:(){ 
                           if(_resetKey.currentState!.validate()){
-                            // if(_errorText_newpassword==null){
                           String new_password = newPassword_controller.text;
                            Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Password Updated Successfully!!')),
+                  const SnackBar(backgroundColor: Colors.orange,
+               padding: EdgeInsets.all(15.0),
+                   behavior: SnackBarBehavior.floating,content: Text('Password Updated Successfully!!')),
                             );
-                            print(logindata.getString('password'));
                 
                             //Updating Password
                             setState(() {
                              isVisibile=true;
                              logindata.setString("password",new_password);
-                           });
-                            // Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginPage()));
-                            
+                           });                            
                             
                           }
                   }, child: Text("Update Password"),
@@ -452,6 +420,7 @@ Widget build(BuildContext context){
           }
         }, child: Text("Submit"),
         ),
+
         //For Going Back To Login Page
         ElevatedButton(onPressed: () {
            setState(() {
