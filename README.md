@@ -1,4 +1,4 @@
-# foody_guru
+# Foody_Guru
 
 A new Flutter project.
 
@@ -11,5 +11,5 @@ This project is a simple Login Page.
 3.Animation
 4.User Session maintained Using Shared Preference
 <p>
-  <img src="Images/IMG_20220526_204339.jpg" width="400" title="MAIN-PAGE">
+  <img src="Images/IMG_20220526_204339.jpg" width="400" title="MAIN-PAGE" align="center">
 </p>
